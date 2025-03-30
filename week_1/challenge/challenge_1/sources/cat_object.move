@@ -1,35 +1,43 @@
 module challenge_1::cat_object;
 
+use std::string::{String};
+
 
 // Challenge: make this struct transferable
-public struct Cat has key {
+public struct Cat has key, store  {
     id: UID,
     // Challenge: make the `name` and `color` fields a String type instead of vector<u8>
-    name: vector<u8>,
-    color: vector<u8>
+    name: String,
+    color: String
 }
 
 
 // Challenge: make this function return the object instead of transfering it
-public fun new(name: vector<u8>, color: vector<u8>, ctx: &mut TxContext) {
-    let cat = Cat {
+public fun new(
+    name: String, 
+    color: String, 
+    ctx: &mut TxContext
+): Cat {
+    Cat {
         id: object::new(ctx),
         name: name,
         color: color
-    };
-    transfer::transfer(cat, ctx.sender());
+    }
+    // No transfer, object is returned directly
 }
+
 
 public fun tchau(cat: Cat) {
     // Challenge: denote that the cat_name and cat_color variables are not going to be used at all in this block
-    let Cat {id, name: cat_name, color: cat_color } = cat;
+    let Cat {id, name: _cat_name, color: _cat_color } = cat;   //The underscore means that this variables are intentionally unused
     object::delete(id);
 }
 
 // Challenge: the cat is here is being returned to the caller.
 // Delete the line that transfers the cat back and fix the code.
 // The resulting code should only have one line, the line that changes the color.
-public fun paint(mut cat: Cat, new_color: vector<u8>, ctx: &mut TxContext) {
+public fun paint(mut cat: Cat, new_color: String, _ctx: &mut TxContext): Cat {
     cat.color = new_color;
-    transfer::transfer(cat, ctx.sender());
+    cat  // Return the modified cat 
 }
+
